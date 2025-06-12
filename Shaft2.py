@@ -4,6 +4,8 @@ import math
 from PIL import Image
 import os
 
+
+
 # Configure page
 st.set_page_config(layout="wide", page_title="Advanced Shaft Fatigue Evaluation")
 
@@ -32,23 +34,23 @@ st.sidebar.header('User Input Parameters')
 
 def user_input_features():
     with st.sidebar.expander("Dimensional Parameters"):
-        Da = st.number_input('Major Diameter (Da, mm)', min_value=0.1, value=38.0)
-        Db = st.number_input('Minor Diameter (Db, mm)', min_value=0.1, value=32.0)
-        L = st.number_input('Shaft Length (L, mm)', min_value=0.1, value=550.0)
-        r = st.number_input('Notch radius (r, mm)', min_value=0.1, value=3.0, 
+        Da = st.number_input('Major Diameter (Da, mm)', min_value=0.1, value=38.0, step=0.1, format="%.3f")
+        Db = st.number_input('Minor Diameter (Db, mm)', min_value=0.1, value=32.0, step=0.1, format="%.3f")
+        L = st.number_input('Shaft Length (L, mm)', min_value=0.1, value=550.0, step=0.1, format="%.3f")
+        r = st.number_input('Notch radius (r, mm)', min_value=0.1, value=3.0, step=0.1, format="%.3f",
                           help="Refer to Figure 1 for location")
-        Lfa = st.number_input('Distance Fa to end (Lfa, mm)', min_value=0.0, value=225.0)
-        Lfb = st.number_input('Distance Fb to end (Lfb, mm)', min_value=0.0, value=300.0)
+        Lfa = st.number_input('Distance Fa to end (Lfa, mm)', min_value=0.0, value=225.0, step=0.1, format="%.3f")
+        Lfb = st.number_input('Distance Fb to end (Lfb, mm)', min_value=0.0, value=300.0, step=0.1, format="%.3f")
     
     with st.sidebar.expander("Loading Conditions"):
-        Fa = st.number_input('Force at A (Fa, N)', value=1000.0)
-        Fb = st.number_input('Force at B (Fb, N)', value=1500.0)
+        Fa = st.number_input('Force at A (Fa, N)', value=1000.0, step=0.1, format="%.3f")
+        Fb = st.number_input('Force at B (Fb, N)', value=1500.0, step=0.1, format="%.3f")
     
     with st.sidebar.expander("Material Properties"):
-        UTS = st.number_input('Ultimate Tensile Strength (UTS, MPa)', min_value=100.0, value=690.0)
-        Sy = st.number_input('Yield Strength (Sy, MPa)', min_value=100.0, value=490.0)
-        a = st.number_input('Surface factor constant (a)', value=4.51)
-        b = st.number_input('Surface factor exponent (b)', value=-0.265)
+        UTS = st.number_input('Ultimate Tensile Strength (UTS, MPa)', min_value=100.0, value=690.0, step=0.1, format="%.3f")
+        Sy = st.number_input('Yield Strength (Sy, MPa)', min_value=100.0, value=490.0, step=0.1, format="%.3f")
+        a = st.number_input('Surface factor constant (a)', value=4.51, step=0.001, format="%.3f")
+        b = st.number_input('Surface factor exponent (b)', value=-0.265, step=0.001, format="%.3f")
     
     # Calculate geometric ratios for Kt
     Dd_ratio = Da / Db
@@ -113,9 +115,22 @@ def perform_calculations(df):
     
     return results
 
+# Format numbers to 3 decimal places
+def format_results(results):
+    formatted = {}
+    for key, value in results.items():
+        if value is None:
+            formatted[key] = "N/A"
+        elif isinstance(value, str):
+            formatted[key] = value
+        else:
+            formatted[key] = f"{float(value):.3f}"
+    return formatted
+
 # Main app flow
 df = user_input_features()
 results = perform_calculations(df)
+formatted_results = format_results(results)
 
 # Display results
 st.subheader("Input Parameters")
@@ -125,8 +140,12 @@ st.subheader("Fatigue Strength Calculations")
 fatigue_results = {
     'Parameter': ['Endurance Limit (Se\')', 'Surface Factor (ka)', 
                  'Size Factor (kb)', 'Corrected Endurance Limit (Se)'],
-    'Value': [results['Se_prime (MPa)'], results['ka'], 
-             results['kb'], results['Se (MPa)']],
+    'Value': [
+        formatted_results['Se_prime (MPa)'],
+        formatted_results['ka'],
+        formatted_results['kb'],
+        formatted_results['Se (MPa)']
+    ],
     'Units': ['MPa', '-', '-', 'MPa']
 }
 st.table(pd.DataFrame(fatigue_results))
@@ -135,10 +154,13 @@ st.subheader("Stress Analysis")
 stress_results = {
     'Parameter': ['Theoretical Kt', 'Fatigue Kf', 'Bending Moment', 
                  'Section Modulus', 'Alternating Stress'],
-    'Value': [results.get('Kt', 'N/A'), results.get('Kf', 'N/A'), 
-             results.get('M_B (N·mm)', 'N/A'), 
-             results.get('Section Modulus (mm³)', 'N/A'),
-             results.get('σ_ar (MPa)', 'N/A')],
+    'Value': [
+        formatted_results.get('Kt', 'N/A'),
+        formatted_results.get('Kf', 'N/A'),
+        formatted_results.get('M_B (N·mm)', 'N/A'),
+        formatted_results.get('Section Modulus (mm³)', 'N/A'),
+        formatted_results.get('σ_ar (MPa)', 'N/A')
+    ],
     'Units': ['-', '-', 'N·mm', 'mm³', 'MPa']
 }
 st.table(pd.DataFrame(stress_results))
