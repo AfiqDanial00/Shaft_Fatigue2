@@ -187,4 +187,22 @@ stress_results = {
 st.table(pd.DataFrame(stress_results))
 
 # Safety factor calculation
-if results['σ_ar (MPa)'] is not None and results['Se (MPa)']
+if results['σ_ar (MPa)'] is not None and results['Se (MPa)'] is not None:
+    safety_factor = results['Se (MPa)'] / results['σ_ar (MPa)']
+    st.metric("Safety Factor Against Fatigue Failure", value=f"{safety_factor:.3f}")
+else:
+    st.warning("Cannot calculate safety factor - missing required parameters")
+
+# Add download button for results
+@st.cache_data
+def convert_df(df):
+    return df.to_csv().encode('utf-8')
+
+csv = convert_df(df)
+st.download_button(
+    label="Download Input Parameters",
+    data=csv,
+    file_name='shaft_parameters.csv',
+    mime='text/csv'
+)
+
