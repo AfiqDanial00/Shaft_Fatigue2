@@ -36,21 +36,21 @@ def user_input_features():
     with st.sidebar.expander("Dimensional Parameters"):
         Da = st.number_input('Major Diameter (Da, mm)', min_value=0.1, value=38.0, step=0.1, format="%.3f")
         Db = st.number_input('Minor Diameter (Db, mm)', min_value=0.1, value=32.0, step=0.1, format="%.3f")
-        L = st.number_input('Shaft Length (L, mm)', min_value=0.1, value=550.0, step=0.1, format="%.3f")
-        r = st.number_input('Notch radius (r, mm)', min_value=0.1, value=3.0, step=0.1, format="%.3f",
+        L = st.number_input('Shaft Length (L, mm)', min_value=0.1, value=0.01, step=0.1, format="%.3f")
+        r = st.number_input('Notch radius (r, mm)', min_value=0.1, value=0.01, step=0.1, format="%.3f",
                           help="Refer to Figure 1 for location")
-        Lfa = st.number_input('Distance Fa to end (Lfa, mm)', min_value=0.0, value=225.0, step=0.1, format="%.3f")
-        Lfb = st.number_input('Distance Fb to end (Lfb, mm)', min_value=0.0, value=300.0, step=0.1, format="%.3f")
+        Lfa = st.number_input('Distance Fa to end (Lfa, mm)', min_value=0.0, value=0.01, step=0.1, format="%.3f")
+        Lfb = st.number_input('Distance Fb to end (Lfb, mm)', min_value=0.0, value=0.01, step=0.1, format="%.3f")
     
     with st.sidebar.expander("Loading Conditions"):
-        Fa = st.number_input('Force at A (Fa, N)', value=1000.0, step=0.1, format="%.3f")
-        Fb = st.number_input('Force at B (Fb, N)', value=1500.0, step=0.1, format="%.3f")
+        Fa = st.number_input('Force at A (Fa, N)', value=0.01, step=0.1, format="%.3f")
+        Fb = st.number_input('Force at B (Fb, N)', value=0.01, step=0.1, format="%.3f")
     
     with st.sidebar.expander("Material Properties"):
-        UTS = st.number_input('Ultimate Tensile Strength (UTS, MPa)', min_value=100.0, value=690.0, step=0.1, format="%.3f")
-        Sy = st.number_input('Yield Strength (Sy, MPa)', min_value=100.0, value=490.0, step=0.1, format="%.3f")
-        a = st.number_input('Surface factor constant (a)', value=4.51, step=0.001, format="%.3f")
-        b = st.number_input('Surface factor exponent (b)', value=-0.265, step=0.001, format="%.3f")
+        UTS = st.number_input('Ultimate Tensile Strength (UTS, MPa)', value=0.01, step=0.1, format="%.3f")
+        Sy = st.number_input('Yield Strength (Sy, MPa)', value=0.01, step=0.1, format="%.3f")
+        a = st.number_input('Surface factor constant (a)', value=0.01, step=0.01, format="%.3f")
+        b = st.number_input('Surface factor exponent (b)', value=-0.01, step=0.01, format="%.3f")
     
     # Calculate geometric ratios for Kt
     Dd_ratio = Da / Db
