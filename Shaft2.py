@@ -155,7 +155,7 @@ stress_results = {
     'Parameter': ['Kt', 'Fatigue Kf', 'Bending Moment', 
                  'Section Modulus', 'Alternating Stress'],
     'Value': [
-        formatted_results.get('Kt'),
+        formatted_results.get('Kt', 'N/A'),
         formatted_results.get('Kf', 'N/A'),
         formatted_results.get('M_B (N·mm)', 'N/A'),
         formatted_results.get('Section Modulus (mm³)', 'N/A'),
