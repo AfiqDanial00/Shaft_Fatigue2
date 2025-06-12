@@ -238,4 +238,3 @@ st.download_button(
     file_name='shaft_parameters.csv',
     mime='text/csv'
 )
-           
