@@ -30,43 +30,43 @@ st.sidebar.header('User Input Parameters')
 
 def user_input_features():
     with st.sidebar.expander("Dimensional Parameters"):
-        Da = st.number_input('Major Diameter (Da, mm)', min_value=0.01, value=0.01, step=0.01, format="%.3f")
-        Db = st.number_input('Minor Diameter (Db, mm)', min_value=0.01, value=0.01, step=0.01, format="%.3f")
-        L = st.number_input('Shaft Length (L, mm)', min_value=0.01, value=0.01, step=0.01, format="%.3f")
-        r = st.number_input('Notch radius (r, mm)', min_value=0.01, value=0.01, step=0.01, format="%.3f",
+        Da = st.number_input('Major Diameter (Da, mm)', min_value=0.1, value=0.01, step=0.01, format="%.3f")
+        Db = st.number_input('Minor Diameter (Db, mm)', min_value=0.1, value=0.01, step=0.01, format="%.3f")
+        L = st.number_input('Shaft Length (L, mm)', min_value=0.1, value=0.01, step=0.01, format="%.3f")
+        r = st.number_input('Notch radius (r, mm)', min_value=0.1, value=0.01, step=0.01, format="%.3f",
                           help="Refer to Figure 1 for location")
-        Lfa = st.number_input('Distance Fa to end (Lfa, mm)', min_value=0.01, value=0.01, step=0.01, format="%.3f")
-        Lfb = st.number_input('Distance Fb to end (Lfb, mm)', min_value=0.01, value=0.01, step=0.01, format="%.3f")
+        Lfa = st.number_input('Distance Fa to end (Lfa, mm)', min_value=0.0, value=0.01, step=0.01, format="%.3f")
+        Lfb = st.number_input('Distance Fb to end (Lfb, mm)', min_value=0.0, value=0.01, step=0.01, format="%.3f")
     
     with st.sidebar.expander("Loading Conditions"):
         Fa = st.number_input('Force at A (Fa, N)', value=0.01, step=0.01, format="%.3f")
         Fb = st.number_input('Force at B (Fb, N)', value=0.01, step=0.01, format="%.3f")
-        mean_load = st.number_input('Mean Load (N)', value=0.01, step=0.01, format="%.3f")
-        amplitude_load = st.number_input('Amplitude Load (N)', value=0.01, step=0.01, format="%.3f")
+        mean_torque = st.number_input('Mean Torque (Tmean, N·mm)', value=0.01, step=0.01, format="%.3f")
+        alternating_torque = st.number_input('Alternating Torque (Talt, N·mm)', value=0.01, step=0.01, format="%.3f")
     
     with st.sidebar.expander("Material Properties"):
         UTS = st.number_input('Ultimate Tensile Strength (UTS, MPa)', value=0.01, step=0.01, format="%.3f")
         Sy = st.number_input('Yield Strength (Sy, MPa)', value=0.01, step=0.01, format="%.3f")
-        a = st.number_input('Surface factor constant (a)', value=0.01, step=0.01, format="%.3f")
-        b = st.number_input('Surface factor exponent (b)', value=-0.01, step=0.01, format="%.3f")
+        a = st.number_input('Surface factor constant (a)', value=0.01, step=0.001, format="%.3f")
+        b = st.number_input('Surface factor exponent (b)', value=-0.01, step=0.001, format="%.3f")
     
     # Calculate geometric ratios for Kt
-    Dd_ratio = Da / Db if Db != 0 else 0
-    rd_ratio = r / Db if Db != 0 else 0
+    Dd_ratio = Da / Db
+    rd_ratio = r / Db
     
     # Kt estimation (simplified - should be replaced with proper interpolation)
-    Kt = 1.0 + 0.5*(Dd_ratio-1)*(1 + 1/math.sqrt(rd_ratio)) if rd_ratio > 0 else 1.0
+    Kt = 1.0 + 0.5*(Dd_ratio-1)*(1 + 1/math.sqrt(rd_ratio))
     
     data = {
         'Da (mm)': Da, 'Db (mm)': Db, 'L (mm)': L, 'r (mm)': r,
         'Fa (N)': Fa, 'Fb (N)': Fb, 'Lfa (mm)': Lfa, 'Lfb (mm)': Lfb,
-        'Mean Load (N)': mean_load, 'Amplitude Load (N)': amplitude_load,
-        'UTS (MPa)': UTS, 'Sy (MPa)': Sy, 'a': a, 'b': b, 'Kt': Kt
+        'UTS (MPa)': UTS, 'Sy (MPa)': Sy, 'a': a, 'b': b, 'Kt': Kt,
+        'Tmean (N·mm)': mean_torque, 'Talt (N·mm)': alternating_torque
     }
     
     return pd.DataFrame(data, index=[0])
 
-# Calculations
+# Calculations following Shigley's methodology
 def perform_calculations(df):
     # Extract values
     Da = df['Da (mm)'].values[0]
@@ -77,56 +77,88 @@ def perform_calculations(df):
     Fb = df['Fb (N)'].values[0]
     Lfa = df['Lfa (mm)'].values[0]
     Lfb = df['Lfb (mm)'].values[0]
-    mean_load = df['Mean Load (N)'].values[0]
-    amplitude_load = df['Amplitude Load (N)'].values[0]
     UTS = df['UTS (MPa)'].values[0]
     Sy = df['Sy (MPa)'].values[0]
     a = df['a'].values[0]
     b = df['b'].values[0]
     Kt = df['Kt'].values[0]
+    Tmean = df['Tmean (N·mm)'].values[0]
+    Talt = df['Talt (N·mm)'].values[0]
     
     # Core calculations
     results = {}
     
-    # Fatigue strength calculations
-    results['Se_prime (MPa)'] = 0.5 * UTS
-    results['ka'] = a * (UTS ** b)
-    results['kb'] = 1.24 * (Da ** -0.107) if 7.62 <= Da <= 51 else 1.51 * (Da ** -0.157)
-    results['Se (MPa)'] = results['ka'] * results['kb'] * results['Se_prime (MPa)']
+    # 1. Fatigue strength calculations (Shigley's Chapter 6)
+    results['Se_prime (MPa)'] = 0.5 * UTS  # Eq. 6-8
     
-    # Neuber's constant
-    if 340 <= UTS <= 1700:
+    # Surface factor (ka)
+    results['ka'] = a * (UTS ** b)  # Eq. 6-19
+    
+    # Size factor (kb)
+    if 2.79 <= Db <= 51:  # Eq. 6-20
+        results['kb'] = 1.24 * (Db ** -0.107)
+    elif 51 < Db <= 254:
+        results['kb'] = 1.51 * (Db ** -0.157)
+    else:
+        results['kb'] = None
+    
+    # Corrected endurance limit
+    if results['kb'] is not None:
+        results['Se (MPa)'] = results['ka'] * results['kb'] * results['Se_prime (MPa)']  # Eq. 6-18
+    else:
+        results['Se (MPa)'] = None
+    
+    # 2. Neuber's constant (for bending/axial)
+    if 340 <= UTS <= 1700:  # Eq. 6-35a
         results['NC (√mm)'] = 1.24 - 2.25e-3*UTS + 1.60e-6*(UTS**2) - 4.11e-10*(UTS**3)
     else:
         results['NC (√mm)'] = None
     
-    # Stress concentration
-    if 'NC (√mm)' in results and results['NC (√mm)'] is not None and r > 0:
-        results['Kf'] = 1 + (Kt - 1)/(1 + results['NC (√mm)']/math.sqrt(r))
+    # 3. Stress concentration factors
+    results['Kt'] = Kt
+    if 'NC (√mm)' in results and results['NC (√mm)'] is not None:
+        results['Kf'] = 1 + (Kt - 1)/(1 + results['NC (√mm)']/math.sqrt(r))  # Eq. 6-33
     else:
         results['Kf'] = None
     
-    # Bending moment and stress
-    results['M_B (N·mm)'] = (Lfa * Fb / L) - 250 if L != 0 else 0
-    results['Section Modulus (mm³)'] = (math.pi * Db**3) / 32
+    # 4. Bending stresses
+    results['M_B (N·mm)'] = (Lfa * Fb / L) - 250  # Bending moment at critical location
+    results['Section Modulus (mm³)'] = (math.pi * Db**3) / 32  # For circular cross-section
     
-    # Stress calculations
     if results['Kf'] is not None and results['Section Modulus (mm³)'] > 0:
-        results['σ_ar (MPa)'] = results['Kf'] * results['M_B (N·mm)'] / results['Section Modulus (mm³)']
+        # Alternating bending stress (σa)
+        results['σ_a (MPa)'] = results['Kf'] * results['M_B (N·mm)'] / results['Section Modulus (mm³)']
+        
+        # Mean bending stress (σm) - assuming R=0 loading (fully reversed)
+        results['σ_m (MPa)'] = 0.0
+        
+        # Combined stresses (for torsion)
+        results['τ_m (MPa)'] = 16 * Tmean / (math.pi * Db**3)  # Mean shear stress
+        results['τ_a (MPa)'] = 16 * Talt / (math.pi * Db**3)   # Alternating shear stress
+        
+        # Maximum and minimum stresses (Eq. 6-36 to 6-38)
+        results['σ_max (MPa)'] = results['σ_m (MPa)'] + results['σ_a (MPa)']
+        results['σ_min (MPa)'] = results['σ_m (MPa)'] - results['σ_a (MPa)']
+        
+        # Von Mises equivalent stresses (Eq. 6-55, 6-56)
+        σa_prime = math.sqrt(results['σ_a (MPa)']**2 + 3*results['τ_a (MPa)']**2)
+        σm_prime = math.sqrt(results['σ_m (MPa)']**2 + 3*results['τ_m (MPa)']**2)
+        
+        results['σa_prime (MPa)'] = σa_prime
+        results['σm_prime (MPa)'] = σm_prime
+        
+        # Safety factor using Modified Goodman (Eq. 6-46)
+        if results['Se (MPa)'] is not None and UTS > 0:
+            n = 1/(σa_prime/results['Se (MPa)'] + σm_prime/UTS)
+            results['Safety Factor (n)'] = n
+        else:
+            results['Safety Factor (n)'] = None
     else:
-        results['σ_ar (MPa)'] = None
-    
-    # Maximum and minimum stress calculations
-    if results['Section Modulus (mm³)'] > 0:
-        results['σ_max (MPa)'] = (mean_load + amplitude_load) / results['Section Modulus (mm³)']
-        results['σ_min (MPa)'] = (mean_load - amplitude_load) / results['Section Modulus (mm³)']
-        results['σ_mean (MPa)'] = mean_load / results['Section Modulus (mm³)']
-        results['σ_amp (MPa)'] = amplitude_load / results['Section Modulus (mm³)']
-    else:
+        results['σ_a (MPa)'] = None
+        results['σ_m (MPa)'] = None
         results['σ_max (MPa)'] = None
         results['σ_min (MPa)'] = None
-        results['σ_mean (MPa)'] = None
-        results['σ_amp (MPa)'] = None
+        results['Safety Factor (n)'] = None
     
     return results
 
@@ -167,29 +199,30 @@ st.table(pd.DataFrame(fatigue_results))
 
 st.subheader("Stress Analysis")
 stress_results = {
-    'Parameter': ['Kt', 'Fatigue Kf', 'Bending Moment', 
-                 'Section Modulus', 'Alternating Stress',
-                 'Maximum Stress', 'Minimum Stress',
-                 'Mean Stress', 'Stress Amplitude'],
+    'Parameter': ['Theoretical Kt', 'Fatigue Kf', 
+                 'Bending Moment', 'Section Modulus',
+                 'Alternating Stress (σa)', 'Mean Stress (σm)',
+                 'Max Stress (σmax)', 'Min Stress (σmin)',
+                 'Alternating Von Mises (σa\')', 'Mean Von Mises (σm\')'],
     'Value': [
-        formatted_results.get('Kt', 'N/A'),
-        formatted_results.get('Kf', 'N/A'),
-        formatted_results.get('M_B (N·mm)', 'N/A'),
-        formatted_results.get('Section Modulus (mm³)', 'N/A'),
-        formatted_results.get('σ_ar (MPa)', 'N/A'),
-        formatted_results.get('σ_max (MPa)', 'N/A'),
-        formatted_results.get('σ_min (MPa)', 'N/A'),
-        formatted_results.get('σ_mean (MPa)', 'N/A'),
-        formatted_results.get('σ_amp (MPa)', 'N/A')
+        formatted_results['Kt'],
+        formatted_results['Kf'],
+        formatted_results['M_B (N·mm)'],
+        formatted_results['Section Modulus (mm³)'],
+        formatted_results['σ_a (MPa)'],
+        formatted_results['σ_m (MPa)'],
+        formatted_results['σ_max (MPa)'],
+        formatted_results['σ_min (MPa)'],
+        formatted_results['σa_prime (MPa)'],
+        formatted_results['σm_prime (MPa)']
     ],
-    'Units': ['-', '-', 'N·mm', 'mm³', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa']
+    'Units': ['-', '-', 'N·mm', 'mm³', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa']
 }
 st.table(pd.DataFrame(stress_results))
 
-# Safety factor calculation
-if results['σ_ar (MPa)'] is not None and results['Se (MPa)'] is not None:
-    safety_factor = results['Se (MPa)'] / results['σ_ar (MPa)']
-    st.metric("Safety Factor Against Fatigue Failure", value=f"{safety_factor:.3f}")
+# Safety factor display
+if results['Safety Factor (n)'] is not None:
+    st.metric("Safety Factor (Modified Goodman)", value=f"{results['Safety Factor (n)']:.3f}")
 else:
     st.warning("Cannot calculate safety factor - missing required parameters")
 
