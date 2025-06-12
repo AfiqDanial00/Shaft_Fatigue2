@@ -119,7 +119,7 @@ results = perform_calculations(df)
 
 # Display results
 st.subheader("Input Parameters")
-st.dataframe(df.style.format("{:.2f}"), use_container_width=True)
+st.dataframe(df.style.format("{:.3f}"), use_container_width=True)
 
 st.subheader("Fatigue Strength Calculations")
 fatigue_results = {
@@ -146,7 +146,7 @@ st.table(pd.DataFrame(stress_results))
 # Safety factor calculation
 if results['σ_ar (MPa)'] is not None and results['Se (MPa)'] is not None:
     safety_factor = results['Se (MPa)'] / results['σ_ar (MPa)']
-    st.metric("Safety Factor Against Fatigue Failure", value=f"{safety_factor:.2f}")
+    st.metric("Safety Factor Against Fatigue Failure", value=f"{safety_factor:.3f}")
 else:
     st.warning("Cannot calculate safety factor - missing required parameters")
 
