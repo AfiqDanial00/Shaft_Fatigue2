@@ -16,7 +16,7 @@ st.header("Advanced Shaft Fatigue Evaluation System")
 fig1, fig2, fig3 = st.tabs(["Shaft Diagram", "Notch Sensitivity", "Stress Concentration"])
 
 with fig1:
-    st.image("https://homework.study.com/cimages/multimages/16/060519-118885225862519178792.jpg",
+    st.image("https://media.cheggcdn.com/media/ceb/ceb70f1b-5eef-456b-b792-2370380aa91c/phpXXeZ27",
              caption="Fig. 1: Schematic Drawing of Shaft with Dimensions", width=600)
 
 with fig2:
