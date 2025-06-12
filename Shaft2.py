@@ -17,7 +17,7 @@ with fig1:
 
 with fig2:
     st.image("https://www.researchgate.net/publication/44220429/figure/download/fig1/AS:670016391356455@1536755764941/Notch-sensitivity-versus-notch-radius-for-steels-and-aluminium-alloys.png",
-             caption="Fig. 2: Notch sensitivity versus notch radius", width=600)
+             caption="Fig. 2 : Notch sensitivity versus notch radius", width=600)
     st.info("Use this chart to determine notch sensitivity (q) based on your material and notch radius")
 
 with fig3:
