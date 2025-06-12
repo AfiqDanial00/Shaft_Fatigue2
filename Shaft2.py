@@ -152,7 +152,7 @@ st.table(pd.DataFrame(fatigue_results))
 
 st.subheader("Stress Analysis")
 stress_results = {
-    'Parameter': ['Theoretical Kt', 'Fatigue Kf', 'Bending Moment', 
+    'Parameter': ['Kt', 'Fatigue Kf', 'Bending Moment', 
                  'Section Modulus', 'Alternating Stress'],
     'Value': [
         formatted_results.get('Kt', 'N/A'),
