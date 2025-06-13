@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import math
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 # Configure page
 st.set_page_config(layout="wide", page_title="Advanced Shaft Fatigue Evaluation")
@@ -39,8 +42,7 @@ def user_input_features():
         Lfb = st.number_input('Distance Fb to end (Lfb, mm)', min_value=0.0, value=30.0, step=0.1, format="%.3f")
     
     with st.sidebar.expander("Loading Conditions"):
-        Fa = st.number_input('Force at A (Fa, N)', min_value=0.0, value=100.0, step=1.0, format="%.3f")
-        Fb = st.number_input('Force at B (Fb, N)', min_value=0.0, value=150.0, step=1.0, format="%.3f")
+        F = st.number_input('Applied Force (F,N)', min_value=0.0, value=100.0, step=1.0, format="%.3f")
         mean_torque = st.number_input('Mean Torque (Tmean, N·mm)', min_value=0.0, value=5000.0, step=100.0, format="%.3f")
         alternating_torque = st.number_input('Alternating Torque (Talt, N·mm)', min_value=0.0, value=2000.0, step=100.0, format="%.3f")
     
@@ -59,7 +61,7 @@ def user_input_features():
     
     data = {
         'Da (mm)': Da, 'Db (mm)': Db, 'L (mm)': L, 'r (mm)': r,
-        'Fa (N)': Fa, 'Fb (N)': Fb, 'Lfa (mm)': Lfa, 'Lfb (mm)': Lfb,
+        'F (N)': F, 'Lfa (mm)': Lfa, 'Lfb (mm)': Lfb,
         'UTS (MPa)': UTS, 'Sy (MPa)': Sy, 'a': a, 'b': b, 'Kt': Kt,
         'Tmean (N·mm)': mean_torque, 'Talt (N·mm)': alternating_torque
     }
@@ -73,8 +75,7 @@ def perform_calculations(df):
     Db = df['Db (mm)'].values[0]
     L = df['L (mm)'].values[0]
     r = df['r (mm)'].values[0]
-    Fa = df['Fa (N)'].values[0]
-    Fb = df['Fb (N)'].values[0]
+    F = df['F (N)'].values[0]
     Lfa = df['Lfa (mm)'].values[0]
     Lfb = df['Lfb (mm)'].values[0]
     UTS = df['UTS (MPa)'].values[0]
@@ -88,7 +89,7 @@ def perform_calculations(df):
     # Core calculations
     results = {}
     
-    # 1. Fatigue strength calculations (Shigley's Chapter 6)
+    # 1. Fatigue strength calculations 
     results['Se_prime (MPa)'] = 0.5 * UTS  # Eq. 6-8
     
     # Surface factor (ka)
@@ -122,7 +123,7 @@ def perform_calculations(df):
         results['Kf'] = None
     
     # 4. Bending stresses
-    results['M_B (N·mm)'] = (Lfa * Fb / L) - 250  # Bending moment at critical location
+    results['M_B (N·mm)'] = (Lfa * F / L) - 250  # Bending moment at critical location
     results['Section Modulus (mm³)'] = (math.pi * Db**3) / 32  # For circular cross-section
     
     if results['Kf'] is not None and results['Section Modulus (mm³)'] > 0:
