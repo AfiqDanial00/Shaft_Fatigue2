@@ -121,7 +121,7 @@ def perform_calculations(df):
         results['Kf'] = None
     
     # 4. Bending stresses
-    results['M_B (N·mm)'] = ((Lfa * F) / L) * 250  # Bending moment at critical location
+    results['M_B (N·m)'] = ((Lfa * F) / L) * 250  # Bending moment at critical location
     results['Section Modulus (mm³)'] = (math.pi * Db**3) / 32  # For circular cross-section
     
     if results['Kf'] is not None and results['Section Modulus (mm³)'] > 0:
