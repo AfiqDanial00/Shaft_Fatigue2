@@ -206,7 +206,7 @@ stress_results = {
     'Value': [
         formatted_results['Kt'],
         formatted_results['Kf'],
-        formatted_results['M_B (N·mm)'],
+        formatted_results['M_B (N·m)'],
         formatted_results['Section Modulus (mm³)'],
         formatted_results['σ_a (MPa)'],
         formatted_results['σ_m (MPa)'],
