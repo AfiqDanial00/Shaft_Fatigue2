@@ -126,7 +126,7 @@ def perform_calculations(df):
     
     if results['Kf'] is not None and results['Section Modulus (mm³)'] > 0:
         # Alternating bending stress (σa)
-        results['σ_a (MPa)'] = results['Kf'] * results['M_B (N·m)'] / results['Section Modulus (mm³)']
+        results['σ_a (MPa)'] = results['Kf'] * (results['M_B (N·m)'] / results['Section Modulus (mm³)'])
         
         # Mean bending stress (σm) - assuming R=0 loading (fully reversed)
         results['σ_m (MPa)'] = 0.0
