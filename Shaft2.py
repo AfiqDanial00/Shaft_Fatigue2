@@ -215,7 +215,7 @@ stress_results = {
         formatted_results['σa_prime (MPa)'],
         formatted_results['σm_prime (MPa)']
     ],
-    'Units': ['-', '-', 'N·mm', 'mm³', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa']
+    'Units': ['-', '-', 'N·m', 'mm³', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa']
 }
 st.table(pd.DataFrame(stress_results))
 
