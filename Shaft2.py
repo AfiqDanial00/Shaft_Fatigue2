@@ -147,6 +147,10 @@ def perform_calculations(df):
         
         results['σa_prime (MPa)'] = σa_prime
         results['σm_prime (MPa)'] = σm_prime
+
+        # constant a for N
+
+        a = ( f*UTS )**2/(Se (Mpa))
         
         # Safety factor using Modified Goodman (Eq. 6-46)
         if results['Se (MPa)'] is not None and UTS > 0:
@@ -205,6 +209,7 @@ stress_results = {
                  'Alternating Stress (σa)', 'Mean Stress (σm)',
                  'Max Stress (σmax)', 'Min Stress (σmin)',
                  'Alternating Von Mises (σa\')', 'Mean Von Mises (σm\')'],
+                 'Constant
     'Value': [
         formatted_results['Kt'],
         formatted_results['Kf'],
