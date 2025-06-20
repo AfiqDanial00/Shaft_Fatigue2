@@ -38,7 +38,7 @@ def user_input_features():
                           help="Refer to Figure 1 for location")
         Lfa = st.number_input('Distance Fa to end (Lfa, mm)', min_value=0.0, value=20.0, step=0.1, format="%.3f")
         Lfb = st.number_input('Distance Fb to end (Lfb, mm)', min_value=0.0, value=30.0, step=0.1, format="%.3f")
-        f =  st.number_input('Fatigue Strength Fraction', min_value=0.0, value=30.0, step=0.1, format="%.3f"
+        f =  st.number_input('Fatigue Strength Fraction', min_value=0.0, value=30.0, step=0.1, format="%.3f",
                           help="Refer to Figure 4 for f value" )
     
     with st.sidebar.expander("Loading Conditions"):
