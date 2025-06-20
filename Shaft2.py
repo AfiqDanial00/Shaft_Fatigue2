@@ -38,6 +38,8 @@ def user_input_features():
                           help="Refer to Figure 1 for location")
         Lfa = st.number_input('Distance Fa to end (Lfa, mm)', min_value=0.0, value=20.0, step=0.1, format="%.3f")
         Lfb = st.number_input('Distance Fb to end (Lfb, mm)', min_value=0.0, value=30.0, step=0.1, format="%.3f")
+        f =  st.number_input('Fatigue Strength Fraction', min_value=0.0, value=30.0, step=0.1, format="%.3f"
+                          help="Refer to Figure 4 for f value" )
     
     with st.sidebar.expander("Loading Conditions"):
         F = st.number_input('Applied Force (F,N)', min_value=0.0, value=100.0, step=1.0, format="%.3f")
@@ -59,7 +61,7 @@ def user_input_features():
     
     data = {
         'Da (mm)': Da, 'Db (mm)': Db, 'L (mm)': L, 'r (mm)': r,
-        'F (N)': F, 'Lfa (mm)': Lfa, 'Lfb (mm)': Lfb,
+        'F (N)': F, 'Lfa (mm)': Lfa, 'Lfb (mm)': Lfb, ' f ': f,
         'UTS (MPa)': UTS, 'Sy (MPa)': Sy, 'a': a, 'b': b, 'Kt': Kt,
         'Tmean (N·mm)': mean_torque, 'Talt (N·mm)': alternating_torque
     }
