@@ -82,6 +82,7 @@ def perform_calculations(df):
     Sy = df['Sy (MPa)'].values[0]
     a = df['a'].values[0]
     b = df['b'].values[0]
+    f = df['f'].values[0]
     Kt = df['Kt'].values[0]
     Tmean = df['Tmean (N·mm)'].values[0]
     Talt = df['Talt (N·mm)'].values[0]
