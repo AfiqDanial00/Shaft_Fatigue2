@@ -209,7 +209,7 @@ stress_results = {
                  'Alternating Stress (σa)', 'Mean Stress (σm)',
                  'Max Stress (σmax)', 'Min Stress (σmin)',
                  'Alternating Von Mises (σa\')', 'Mean Von Mises (σm\')'],
-                 'Constant
+        
     'Value': [
         formatted_results['Kt'],
         formatted_results['Kf'],
