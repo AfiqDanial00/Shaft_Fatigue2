@@ -136,7 +136,7 @@ st.table(pd.DataFrame({
 
 st.subheader("Stress Analysis")
 st.table(pd.DataFrame({
-    'Parameter': ['Kt', 'Kf', 'Bending Moment', 'Section Modulus', 'σa', 'σm', 'σmax', 'σmin', 'σa'', 'σm''],
+    'Parameter': ['Kt', 'Kf', 'Bending Moment', 'Section Modulus', 'σa', 'σm', 'σmax', 'σmin', "σa'", "σm'"],
     'Value': [
         formatted['Kt'], formatted['Kf'], formatted['M_B'], formatted['Z'],
         formatted['σ_a'], formatted['σ_m'], formatted['σ_max'],
@@ -160,4 +160,3 @@ st.download_button(
     file_name="shaft_parameters.csv",
     mime="text/csv"
 )  # End of script
-
