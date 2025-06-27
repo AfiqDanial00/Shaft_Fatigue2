@@ -129,7 +129,7 @@ st.dataframe(input_df.style.format("{:.3f}"), use_container_width=True)
 
 st.subheader("Fatigue Strength Calculations")
 st.table(pd.DataFrame({
-    'Parameter': ['Se'', 'ka', 'kb', 'Se'],
+    'Parameter': ["Se'", 'ka', 'kb', 'Se'],
     'Value': [formatted['Se_prime'], formatted['ka'], formatted['kb'], formatted['Se']],
     'Units': ['MPa', '-', '-', 'MPa']
 }))
@@ -160,3 +160,4 @@ st.download_button(
     file_name="shaft_parameters.csv",
     mime="text/csv"
 )  # End of script
+
