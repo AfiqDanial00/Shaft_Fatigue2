@@ -5,7 +5,7 @@ import math
 import numpy as np
 
 # Configure page
-st.set_page_config(layout="wide", page_title="Advanced Shaft Fatigue Evaluation")
+st.set_page_config(layout="wide", page_title="FatigPro-Advanced Shaft Fatigue Failure Evaluation")
 
 # Main header
 st.header("Advanced Shaft Fatigue Evaluation System")
