@@ -8,7 +8,7 @@ import numpy as np
 st.set_page_config(layout="wide", page_title="FatigPro-Advanced Shaft Fatigue Failure Evaluation")
 
 # Main header
-st.header("Advanced Shaft Fatigue Evaluation System")
+st.header("FatigPro-Advanced Shaft Fatigue Failure Evaluation")
 
 # Display figures in tabs
 fig1, fig2, fig3 = st.tabs(["Shaft Diagram", "Notch Sensitivity", "Stress Concentration"])
