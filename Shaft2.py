@@ -103,7 +103,6 @@ def perform_calculations(df):
 
         n = 1 / (sigma_a_prime / Se + sigma_m_prime / vals['UTS']) if Se else None
         
-        # Fatigue life calculations
         if Se and sigma_a_prime:
             a = (vals['f'] * vals['UTS'])**2 / Se
             b = -(1/3) * math.log10((vals['f'] * vals['UTS']) / Se)
@@ -163,18 +162,33 @@ st.table(pd.DataFrame({
     'Units': ['-', '-', 'N·m', 'mm³', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa']
 }))
 
-# Safety Factor and Status
-if calc_results['Safety Factor'] is not None:
-    st.metric("Safety Factor (Modified Goodman)", f"{calc_results['Safety Factor']:.3f}")
+# Modernized Safety Factor Display
+st.subheader("Shaft Safety Evaluation")
 
-    # Determine if shaft is safe
-    safety_threshold = 1.5
-    if calc_results['Safety Factor'] >= safety_threshold:
-        st.success(f"The shaft is SAFE (Safety Factor ≥ {safety_threshold}).")
-    else:
-        st.error(f"The shaft is UNSAFE (Safety Factor < {safety_threshold}). Consider design modifications.")
+if calc_results['Safety Factor'] is not None:
+    col1, col2 = st.columns([1, 3])
+
+    with col1:
+        st.metric("Safety Factor", f"{calc_results['Safety Factor']:.3f}")
+
+    with col2:
+        safety_threshold = 1.5
+        if calc_results['Safety Factor'] >= safety_threshold:
+            st.markdown("""
+                <div style='background-color:#d4edda; padding:15px; border-radius:10px; color:#155724; border:1px solid #c3e6cb;'>
+                    ✅ <strong>The shaft is SAFE</strong><br>
+                    The safety factor meets the minimum requirement (≥ 1.5).
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+                <div style='background-color:#f8d7da; padding:15px; border-radius:10px; color:#721c24; border:1px solid #f5c6cb;'>
+                    ❌ <strong>The shaft is UNSAFE</strong><br>
+                    The safety factor is below the acceptable limit (< 1.5). Consider redesigning the shaft or reducing the load.
+                </div>
+            """, unsafe_allow_html=True)
 else:
-    st.warning("Unable to calculate Safety Factor. Check inputs.")
+    st.warning("Unable to calculate Safety Factor. Please check your input values.")
 
 # Display Fatigue Life Results if available
 if 'a' in calc_results and calc_results['a'] is not None:
