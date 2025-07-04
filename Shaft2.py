@@ -163,8 +163,16 @@ st.table(pd.DataFrame({
     'Units': ['-', '-', 'N·m', 'mm³', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa', 'MPa']
 }))
 
-if calc_results['Safety Factor']:
+# Safety Factor and Status
+if calc_results['Safety Factor'] is not None:
     st.metric("Safety Factor (Modified Goodman)", f"{calc_results['Safety Factor']:.3f}")
+
+    # Determine if shaft is safe
+    safety_threshold = 1.5
+    if calc_results['Safety Factor'] >= safety_threshold:
+        st.success(f"The shaft is SAFE (Safety Factor ≥ {safety_threshold}).")
+    else:
+        st.error(f"The shaft is UNSAFE (Safety Factor < {safety_threshold}). Consider design modifications.")
 else:
     st.warning("Unable to calculate Safety Factor. Check inputs.")
 
